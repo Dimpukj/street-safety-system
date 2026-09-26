@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Account — Street Safety System</title>
+    <link rel="stylesheet" href="landing-style.css">
+    <style>
+        .auth-viewport {
+            min-height: calc(100vh - 180px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            background-color: var(--color-bg-base);
+        }
+
+        .auth-card {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-ink-primary);
+            border-radius: var(--radius-sm);
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--shadow-elevated);
+            overflow: hidden;
+        }
+
+        .auth-card-header {
+            background: var(--color-ink-primary);
+            color: #ffffff;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auth-card-header .header-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .auth-card-header .security-badge {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        .auth-card-body {
+            padding: 28px 24px;
+        }
+
+        .auth-card-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            color: var(--color-ink-primary);
+        }
+
+        .auth-card-sub {
+            font-size: 0.85rem;
+            color: var(--color-ink-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--color-ink-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 11px 14px;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            color: var(--color-ink-primary);
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border-grid);
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-ink-primary);
+            box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
+        }
+
+        .auth-submit-btn {
+            width: 100%;
+            padding: 13px 20px;
+            background: var(--color-ink-primary);
+            color: #ffffff;
+            border: 1px solid var(--color-ink-primary);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-sans);
+            font-size: 0.92rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            margin-top: 8px;
+        }
+
+        .auth-submit-btn:hover {
+            background: #1e293b;
+        }
+
+        .auth-error-box {
+            display: none;
+            padding: 10px 14px;
+            background: var(--signal-red-bg);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: var(--signal-red);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+        }
+
+        .auth-success-box {
+            display: none;
+            padding: 10px 14px;
+            background: var(--signal-green-bg);
+            border: 1px solid rgba(22, 163, 74, 0.3);
+            color: var(--signal-green);
+            font-size: 0.82rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+        }
+
+        .auth-footer-notice {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--color-border-grid);
+            font-size: 0.82rem;
+            color: var(--color-ink-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auth-link {
+            color: var(--signal-blue);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Civic Top Banner -->
+    <header class="civic-header">
+        <div class="civic-top-bar">
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>CITIZEN REGISTRY // PUBLIC ENROLLMENT</span>
+            </div>
+            <div>STATUS: REGISTRY OPEN</div>
+        </div>
+
+        <nav class="civic-nav">
+            <a href="landing.html" class="brand-unit">
+                <div class="brand-emblem">SSS</div>
+                <div class="brand-text">
+                    <span class="brand-name">Street Safety System</span>
+                    <span class="brand-sub">Civic Hazard &amp; Wayfinding Network</span>
+                </div>
+            </a>
+
+            <div class="nav-actions">
+                <a href="landing.html" class="btn-civic btn-civic-outline">← Return to Overview</a>
+                <a href="login.html" class="btn-civic btn-civic-outline">Sign In</a>
+                <a href="map.html" class="btn-civic btn-civic-accent">Live Map ↗</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="auth-viewport">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <span class="header-tag">Citizen Enrollment</span>
+                <span class="security-badge">NEW RECORD</span>
+            </div>
+
+            <div class="auth-card-body">
+                <h2 class="auth-card-title">Register Account</h2>
+                <p class="auth-card-sub">Establish an authorized citizen record to report street hazards, validate community alerts, and submit telemetry.</p>
+
+                <div id="registerError" class="auth-error-box"></div>
+                <div id="registerSuccess" class="auth-success-box"></div>
+
+                <form id="registerForm">
+                    <div class="form-row">
+                        <label class="form-label" for="username">Citizen Call-Sign / Username</label>
+                        <input class="form-input" type="text" id="username" placeholder="e.g. Inspector_Ravi / Mysuru_Citizen" required autocomplete="username">
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label" for="email">Citizen Email Address</label>
+                        <input class="form-input" type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label" for="password">Create Security Password</label>
+                        <input class="form-input" type="password" id="password" placeholder="At least 6 characters" required autocomplete="new-password">
+                    </div>
+
+                    <button type="submit" class="auth-submit-btn" id="registerBtn">Create Citizen Record</button>
+                </form>
+
+                <div class="auth-footer-notice">
+                    <span>Already registered?</span>
+                    <a href="login.html" class="auth-link">Sign In Instead →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="civic-footer">
+        <div class="footer-bottom" style="margin-top: 0;">
+            <span>&copy; 2026 Street Safety System. Public Citizen Registry.</span>
+            <span>DATA INTEGRITY PROTOCOL // WGS84</span>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const registerError = document.getElementById('registerError');
+            const registerSuccess = document.getElementById('registerSuccess');
+            const registerBtn = document.getElementById('registerBtn');
+
+            registerError.style.display = 'none';
+            registerSuccess.style.display = 'none';
+            registerBtn.textContent = 'Enrolling Record...';
+            registerBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.token) {
+                        localStorage.setItem('authToken', data.token);
+                    }
+                    const userEmail = (data.user && data.user.email) || email;
+                    localStorage.setItem('authUserEmail', userEmail);
+                    registerSuccess.textContent = data.message || 'Registration completed successfully. Initializing authorized terminal...';
+                    registerSuccess.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = 'map.html';
+                    }, 1000);
+                } else {
+                    registerError.textContent = data.error || 'Registration failed. Please check inputs.';
+                    registerError.style.display = 'block';
+                    registerBtn.textContent = 'Create Citizen Record';
+                    registerBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                registerError.textContent = 'An unexpected communication error occurred.';
+                registerError.style.display = 'block';
+                registerBtn.textContent = 'Create Citizen Record';
+                registerBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

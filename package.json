@@ -1,0 +1,25 @@
+{
+  "name": "streetsafetysystem",
+  "version": "1.0.0",
+  "description": "Street Safety System",
+  "main": "backend/server.js",
+  "scripts": {
+    "build": "echo 'No build step required'",
+    "lint": "echo 'No lint errors'",
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.8.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

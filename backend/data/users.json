@@ -1,0 +1,26 @@
+[
+  {
+    "username": "ward_officer",
+    "email": "officer@mysuru.gov",
+    "password": "$2b$10$PVEt.Z7WjDoAQuUOtb83L.xYdxm2dYILNG2J.VDDOLht4t84JaHH.",
+    "createdAt": "2026-08-29T16:23:59.000Z"
+  },
+  {
+    "username": "mysuru_citizen",
+    "email": "citizen@mysuru.gov",
+    "password": "$2b$10$CtCPNrWoV7lvaWKtkdfM.eCIu2MBNuFWusIkjeBeLxJ54lItYz.Yi",
+    "createdAt": "2026-08-29T16:23:59.000Z"
+  },
+  {
+    "username": "anurag_singh",
+    "email": "anuragsinghsisodiya21@gmail.com",
+    "password": "$2b$10$CtCPNrWoV7lvaWKtkdfM.eCIu2MBNuFWusIkjeBeLxJ54lItYz.Yi",
+    "createdAt": "2026-08-29T16:23:59.000Z"
+  },
+  {
+    "username": "civic_demo_user",
+    "email": "demo@streetsafety.gov",
+    "password": "$2b$10$CtCPNrWoV7lvaWKtkdfM.eCIu2MBNuFWusIkjeBeLxJ54lItYz.Yi",
+    "createdAt": "2026-08-29T16:23:59.000Z"
+  }
+]

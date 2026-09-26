@@ -1,0 +1,844 @@
+/* ==========================================================================
+   STREET SAFETY SYSTEM — MAP & WAYFINDING CIVIC STYLESHEET
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    --color-bg-base: #f4f5f7;
+    --color-bg-surface: #ffffff;
+    --color-bg-subtle: #f8fafc;
+    --color-bg-panel: #ffffff;
+    
+    --color-ink-primary: #0f172a;
+    --color-ink-secondary: #334155;
+    --color-ink-muted: #64748b;
+    --color-ink-faint: #94a3b8;
+    
+    --color-border-grid: #e2e8f0;
+    --color-border-dark: #0f172a;
+    
+    /* Strict Signaling Palette */
+    --signal-red: #dc2626;
+    --signal-red-bg: #fef2f2;
+    --signal-orange: #ea580c;
+    --signal-orange-bg: #fff7ed;
+    --signal-amber: #d97706;
+    --signal-amber-bg: #fffbeb;
+    --signal-green: #16a34a;
+    --signal-green-bg: #f0fdf4;
+    --signal-blue: #2563eb;
+    --signal-blue-bg: #eff6ff;
+    --signal-purple: #7c3aed;
+    --signal-purple-bg: #f5f3ff;
+    
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace;
+    
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    
+    --shadow-map-ui: 0 4px 16px rgba(15, 23, 42, 0.12), 0 1px 3px rgba(15, 23, 42, 0.08);
+    --shadow-modal: 0 20px 35px -5px rgba(15, 23, 42, 0.25), 0 10px 15px -5px rgba(15, 23, 42, 0.1);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-sans);
+    background-color: #e5e7eb;
+    color: var(--color-ink-primary);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum";
+}
+
+/* ==========================================================================
+   MAP FULL CANVAS
+   ========================================================================== */
+
+#map {
+    width: 100%;
+    height: calc(100vh - 44px);
+    margin-top: 44px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   CIVIC CONTROL-ROOM TOP COMMAND BAR
+   ========================================================================== */
+
+.map-control-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background: var(--color-ink-primary);
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 2000;
+    border-bottom: 2px solid #000000;
+    font-size: 0.82rem;
+}
+
+.map-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.map-brand-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    font-size: 0.88rem;
+}
+
+.map-brand-tag {
+    background: #2563eb;
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+}
+
+.map-bar-center {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.telemetry-readout {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.telemetry-readout span.val {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.live-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px #22c55e;
+}
+
+.map-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-report-hazard {
+    background: var(--signal-red);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.78rem;
+    font-family: var(--font-sans);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.15s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-report-hazard:hover {
+    background: #b91c1c;
+}
+
+.btn-bar-action {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.btn-bar-action:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================================================
+   WAYFINDING & ROUTE CONTROL PANEL (LEFT FLOAT)
+   ========================================================================== */
+
+.route-nav-panel {
+    position: absolute;
+    top: 58px;
+    left: 14px;
+    z-index: 1000;
+    width: 360px;
+    max-width: calc(100vw - 28px);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-ink-primary);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-map-ui);
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.panel-header {
+    background: var(--color-ink-primary);
+    color: #ffffff;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-ink-primary);
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-header button {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    width: 24px;
+    height: 24px;
+    border-radius: 2px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.panel-header button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+#panelContent {
+    padding: 14px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    background: var(--color-bg-surface);
+}
+
+.nav-input-group {
+    margin-bottom: 12px;
+}
+
+.nav-input-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 5px;
+    color: var(--color-ink-primary);
+}
+
+.input-with-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.input-with-buttons input {
+    flex: 1;
+    padding: 9px 11px;
+    border: 1px solid var(--color-border-grid);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--color-ink-primary);
+    background: #ffffff;
+    transition: border-color 0.15s ease;
+}
+
+.input-with-buttons input:focus {
+    outline: none;
+    border-color: var(--color-ink-primary);
+    box-shadow: 0 0 0 1px var(--color-ink-primary);
+}
+
+.input-with-buttons button {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-grid);
+    border-radius: var(--radius-sm);
+    padding: 0 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--color-ink-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.input-with-buttons button:hover {
+    background: #e2e8f0;
+    color: var(--color-ink-primary);
+}
+
+.action-button-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    margin-bottom: 12px;
+}
+
+.btn-primary {
+    flex: 2;
+    background-color: var(--signal-blue);
+    color: #ffffff;
+    border: 1px solid var(--signal-blue);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    flex: 1;
+    background-color: var(--color-bg-subtle);
+    color: var(--color-ink-primary);
+    border: 1px solid var(--color-border-grid);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 12px;
+    font-size: 0.82rem;
+    color: var(--signal-blue);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    background: var(--signal-blue-bg);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+}
+
+/* Route Outcome Cards */
+.route-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.route-card {
+    border: 1px solid var(--color-border-grid);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    background: #ffffff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.route-card:hover {
+    border-color: var(--color-ink-primary);
+}
+
+.fastest-card { border-left: 4px solid var(--signal-blue); }
+.safest-card { border-left: 4px solid var(--signal-green); }
+.optimal-card { border-left: 4px solid var(--signal-purple); }
+
+.route-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.route-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--color-ink-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.route-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.fastest-indicator { background-color: var(--signal-blue); }
+.safest-indicator { background-color: var(--signal-green); }
+.optimal-indicator { background-color: var(--signal-purple); }
+
+.route-card-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.1fr;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background: var(--color-bg-base);
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.route-card-metrics .metric {
+    display: flex;
+    flex-direction: column;
+}
+
+.metric .label {
+    font-size: 0.65rem;
+    color: var(--color-ink-muted);
+    text-transform: uppercase;
+}
+
+.metric .value {
+    font-weight: 700;
+    color: var(--color-ink-primary);
+}
+
+.safety-badge {
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffffff;
+    background-color: #64748b;
+    text-align: center;
+    text-transform: uppercase;
+    align-self: flex-start;
+}
+
+/* Map Legend */
+.map-legend {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-grid);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+}
+
+.map-legend h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.legend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-ink-secondary);
+}
+
+.legend-item .color-box {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   MARKER STYLE TOGGLE WIDGET (TOP RIGHT)
+   ========================================================================== */
+
+.marker-style-panel {
+    background: #ffffff !important;
+    border: 1px solid var(--color-ink-primary) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-map-ui) !important;
+    padding: 8px 12px !important;
+    font-family: var(--font-sans) !important;
+    color: var(--color-ink-primary) !important;
+    z-index: 1000 !important;
+    margin-top: 14px !important;
+}
+
+.marker-style-header {
+    font-weight: 800;
+    font-size: 0.72rem;
+    margin-bottom: 6px;
+    color: var(--color-ink-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: var(--font-mono);
+    border-bottom: 1px solid var(--color-border-grid);
+    padding-bottom: 4px;
+}
+
+.marker-style-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.marker-style-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    color: var(--color-ink-secondary);
+}
+
+.marker-style-option:hover {
+    color: var(--color-ink-primary);
+}
+
+.marker-style-option input[type="radio"] {
+    cursor: pointer;
+    accent-color: var(--color-ink-primary);
+    margin: 0;
+}
+
+/* ==========================================================================
+   HAZARD INTAKE MODAL FORM
+   ========================================================================== */
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 3000;
+    display: none;
+}
+
+#crimeReportForm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-bg-surface);
+    padding: 0;
+    border: 1px solid var(--color-ink-primary);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-modal);
+    z-index: 3001;
+    width: 92%;
+    max-width: 460px;
+    overflow: hidden;
+}
+
+.report-modal-header {
+    background: var(--color-ink-primary);
+    color: #ffffff;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-modal-header h3 {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+}
+
+.report-modal-header .form-code {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.report-modal-body {
+    padding: 20px 18px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#crimeReportForm label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+#crimeReportForm input[type="text"],
+#crimeReportForm textarea,
+#crimeReportForm select {
+    width: 100%;
+    padding: 9px 12px;
+    margin-bottom: 14px;
+    border: 1px solid var(--color-border-grid);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    color: var(--color-ink-primary);
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+#crimeReportForm input[type="text"]:focus,
+#crimeReportForm textarea:focus,
+#crimeReportForm select:focus {
+    outline: none;
+    border-color: var(--color-ink-primary);
+    box-shadow: 0 0 0 1px var(--color-ink-primary);
+}
+
+#crimeReportForm textarea {
+    resize: vertical;
+}
+
+.location-picker-box {
+    background: var(--color-bg-base);
+    border: 1px solid var(--color-border-grid);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    margin-bottom: 14px;
+}
+
+.picker-hint {
+    font-size: 0.72rem;
+    color: var(--signal-blue);
+    font-weight: 600;
+    margin-top: 4px;
+    display: block;
+    font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   PROXIMITY ALERT & DETAILS HUD (BOTTOM LEFT)
+   ========================================================================== */
+
+.crime-details-display {
+    background: #ffffff !important;
+    border: 1px solid var(--color-ink-primary) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-map-ui) !important;
+    padding: 10px 12px !important;
+    max-width: 280px !important;
+    font-family: var(--font-sans) !important;
+    color: var(--color-ink-primary) !important;
+}
+
+.crime-details-display h4 {
+    margin: 0 0 4px 0 !important;
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
+    color: var(--signal-red) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    font-family: var(--font-mono) !important;
+}
+
+.crime-details-display p {
+    margin-bottom: 0 !important;
+    font-size: 0.8rem !important;
+    color: var(--color-ink-secondary) !important;
+    line-height: 1.4 !important;
+}
+
+/* ==========================================================================
+   CUSTOM LEAFLET POPUP STYLING (SWISS TYPOGRAPHY)
+   ========================================================================== */
+
+.leaflet-popup-content-wrapper {
+    background: #ffffff !important;
+    color: var(--color-ink-primary) !important;
+    border: 1px solid var(--color-ink-primary) !important;
+    border-radius: var(--radius-sm) !important;
+    box-shadow: var(--shadow-map-ui) !important;
+    padding: 0 !important;
+    font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-content {
+    margin: 12px 14px !important;
+    line-height: 1.45 !important;
+    font-size: 0.84rem !important;
+}
+
+.leaflet-popup-tip {
+    background: #ffffff !important;
+}
+
+.popup-header-tag {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-bottom: 6px;
+}
+
+.popup-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--color-ink-primary);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+}
+
+.popup-location {
+    font-size: 0.8rem;
+    color: var(--color-ink-secondary);
+    margin-bottom: 8px;
+}
+
+.popup-metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    background: var(--color-bg-base);
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    margin-bottom: 8px;
+}
+
+.popup-metric-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-metric-item span.lbl {
+    color: var(--color-ink-muted);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+}
+
+.popup-metric-item span.val {
+    font-weight: 700;
+    color: var(--color-ink-primary);
+}
+
+.popup-footer-time {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--color-ink-muted);
+}
+
+/* Auth & Voting UI Elements */
+.btn-report-hazard:disabled {
+    background: #64748b;
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-report-hazard:disabled:hover {
+    background: #64748b;
+}
+
+.btn-vote-disabled {
+    opacity: 0.55;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
+
+.auth-vote-prompt-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 6px 8px;
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    margin-top: 6px;
+    transition: background 0.15s ease;
+}
+
+.auth-vote-prompt-pill:hover {
+    background: #fef3c7;
+}
+

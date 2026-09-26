@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Street Safety Map — Civic Wayfinding & Incident Telemetry</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Custom Swiss Map Styles -->
+    <link rel="stylesheet" href="map-style.css">
+</head>
+<body>
+    <!-- Civic Control-Room Top Command Bar -->
+    <div class="map-control-bar">
+        <div class="map-bar-left">
+            <a href="landing.html" class="map-brand-link">
+                <span>SSS</span>
+                <span>Street Safety Map</span>
+            </a>
+            <span class="map-brand-tag">MYSURU SECTOR</span>
+        </div>
+
+        <div class="map-bar-center">
+            <div class="telemetry-readout">
+                <span class="live-dot"></span>
+                <span>STATUS: <span class="val">ACTIVE</span></span>
+            </div>
+            <div class="telemetry-readout">
+                <span>COORDINATES: <span id="cursorCoordsReadout" class="val">12.3052° N, 76.6552° E</span></span>
+            </div>
+            <div class="telemetry-readout" style="display: none;" id="activeHazardsCountBlock">
+                <span>HAZARDS: <span id="activeHazardsCountVal" class="val">--</span></span>
+            </div>
+        </div>
+
+        <div class="map-bar-right">
+            <div id="authPromptContainer" style="display: flex; align-items: center; gap: 8px;">
+                <span id="authNotice" class="auth-notice" style="display: none; font-family: var(--font-mono); font-size: 0.72rem; color: #fbbf24;">
+                    <a href="login.html" style="color: #fbbf24; text-decoration: underline;">Log in to report or vote</a>
+                </span>
+                <a href="login.html" id="authLoginLink" class="btn-bar-action" style="display: inline-flex;">Sign In →</a>
+                <span id="authUserBadge" class="auth-user-badge" style="display: none; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.72rem; color: #93c5fd; background: rgba(37,99,235,0.2); border: 1px solid rgba(59,130,246,0.4); padding: 4px 8px; border-radius: 3px;">
+                    <span style="color: #60a5fa;">●</span> <span id="userEmailSpan"></span>
+                </span>
+                <button id="authLogoutBtn" class="btn-bar-action" style="display: none;" title="Log out">Sign Out ⎋</button>
+            </div>
+            <button id="reportCrimeBtn" class="btn-report-hazard">⚠️ Report Hazard</button>
+            <a href="landing.html" class="btn-bar-action" title="Return to Civic Landing Page">Overview ↗</a>
+        </div>
+    </div>
+
+    <!-- Map Canvas -->
+    <div id="map"></div>
+
+    <!-- Navigation & Route Control Panel (Left Floating Wayfinding Unit) -->
+    <div id="routeNavigationPanel" class="route-nav-panel">
+        <div class="panel-header">
+            <h3><span>🧭</span> Safety Wayfinding</h3>
+            <button id="togglePanelBtn" title="Toggle Panel">&minus;</button>
+        </div>
+
+        <div id="panelContent">
+            <!-- Source Input -->
+            <div class="nav-input-group">
+                <label for="sourceInput">
+                    <span>Origin / Start</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-ink-muted);">[SOURCE]</span>
+                </label>
+                <div class="input-with-buttons">
+                    <input type="text" id="sourceInput" placeholder="Address, landmark or pick pin..." />
+                    <button id="useMyLocationBtn" type="button" title="Use current GPS location">📍</button>
+                    <button id="pickSourceBtn" type="button" title="Pick point on map">🗺️</button>
+                </div>
+            </div>
+
+            <!-- Destination Input -->
+            <div class="nav-input-group">
+                <label for="destInput">
+                    <span>Destination Point</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-ink-muted);">[TARGET]</span>
+                </label>
+                <div class="input-with-buttons">
+                    <input type="text" id="destInput" placeholder="Address, landmark or pick pin..." />
+                    <button id="pickDestBtn" type="button" title="Pick point on map">🗺️</button>
+                </div>
+            </div>
+
+            <div class="action-button-row">
+                <button id="generateRoutesBtn" class="btn-primary">Compute Routes</button>
+                <button id="clearRoutesBtn" class="btn-secondary">Reset</button>
+            </div>
+
+            <div id="routeLoadingSpinner" style="display: none;" class="loading-spinner">
+                Computing Safety-Aware Trajectories...
+            </div>
+
+            <!-- Route Info Cards Container -->
+            <div id="routeCardsContainer" class="route-cards-container" style="display: none;">
+                <!-- Fastest Route Card -->
+                <div id="fastestRouteCard" class="route-card fastest-card">
+                    <div class="route-card-header">
+                        <span class="route-title"><span class="route-indicator fastest-indicator"></span> Fastest Path</span>
+                        <input type="checkbox" id="toggleFastestRoute" checked title="Show/Hide route on map" />
+                    </div>
+                    <div class="route-card-metrics">
+                        <div class="metric"><span class="label">Distance</span> <span id="fastestDistance" class="value">0 km</span></div>
+                        <div class="metric"><span class="label">Hazard Score</span> <span id="fastestHazard" class="value">0</span></div>
+                        <div class="metric"><span class="label">Safety Tier</span> <span id="fastestSafety" class="safety-badge">--</span></div>
+                    </div>
+                </div>
+
+                <!-- Safest Route Card -->
+                <div id="safestRouteCard" class="route-card safest-card">
+                    <div class="route-card-header">
+                        <span class="route-title"><span class="route-indicator safest-indicator"></span> Safest Path</span>
+                        <input type="checkbox" id="toggleSafestRoute" checked title="Show/Hide route on map" />
+                    </div>
+                    <div class="route-card-metrics">
+                        <div class="metric"><span class="label">Distance</span> <span id="safestDistance" class="value">0 km</span></div>
+                        <div class="metric"><span class="label">Hazard Score</span> <span id="safestHazard" class="value">0</span></div>
+                        <div class="metric"><span class="label">Safety Tier</span> <span id="safestSafety" class="safety-badge">--</span></div>
+                    </div>
+                </div>
+
+                <!-- Optimal Route Card -->
+                <div id="optimalRouteCard" class="route-card optimal-card">
+                    <div class="route-card-header">
+                        <span class="route-title"><span class="route-indicator optimal-indicator"></span> Optimal Trade-off</span>
+                        <input type="checkbox" id="toggleOptimalRoute" checked title="Show/Hide route on map" />
+                    </div>
+                    <div class="route-card-metrics">
+                        <div class="metric"><span class="label">Distance</span> <span id="optimalDistance" class="value">0 km</span></div>
+                        <div class="metric"><span class="label">Hazard Score</span> <span id="optimalHazard" class="value">0</span></div>
+                        <div class="metric"><span class="label">Safety Tier</span> <span id="optimalSafety" class="safety-badge">--</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safety Levels Legend -->
+            <div class="map-legend">
+                <h4>Signal Severity Legend</h4>
+                <div class="legend-grid">
+                    <div class="legend-item"><span class="color-box" style="background-color: #2563eb;"></span> Blue: Very Safe</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #16a34a;"></span> Green: Safe</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #d97706;"></span> Yellow: Moderate</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #ea580c;"></span> Orange: High Risk</div>
+                    <div class="legend-item"><span class="color-box" style="background-color: #dc2626;"></span> Red: Critical</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Backdrop for Hazard Report -->
+    <div id="modalBackdrop" class="modal-backdrop"></div>
+
+    <!-- Hazard Report Intake Form Modal -->
+    <div id="crimeReportForm" style="display: none;">
+        <div class="report-modal-header">
+            <h3>Citizen Hazard Report</h3>
+            <span class="form-code">FORM SSS-04</span>
+        </div>
+
+        <div class="report-modal-body">
+            <form id="crimeForm">
+                <div class="form-group">
+                    <label for="crime-type">Hazard Category</label>
+                    <select id="crime-type" name="crime-type" required>
+                        <option value="">Select Hazard Category</option>
+                        <option value="Road Accident">🚗 Road Accident / Collision</option>
+                        <option value="Pothole">🕳️ Pothole / Surface Defect</option>
+                        <option value="Broken Streetlight">💡 Broken Streetlight / Outage</option>
+                        <option value="Poor Lighting">🌑 Poor Lighting / Dark Zone</option>
+                        <option value="Stray Dogs">🐕 Stray Animal Activity</option>
+                        <option value="Road Construction">🚧 Road Construction / Works</option>
+                        <option value="Fallen Tree">🌳 Fallen Tree / Obstruction</option>
+                        <option value="Flooded Road">🌊 Waterlogging / Flooded Road</option>
+                        <option value="Traffic Signal Failure">🚦 Traffic Signal Failure</option>
+                        <option value="Unsafe Crossing">🚶 Unsafe Pedestrian Crossing</option>
+                        <option value="Open Manhole">🕳️ Open Manhole / Drain Defect</option>
+                        <option value="Medical Emergency">🚑 Medical Emergency Alert</option>
+                        <option value="Fire Hazard">🔥 Fire Hazard Alert</option>
+                        <option value="Crime Alert">🚨 Crime / Suspicious Activity</option>
+                        <option value="General Hazard">⚠️ General Safety Hazard</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="hazard-severity">Severity Rating (1 - 10)</label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="range" id="hazard-severity" name="hazard-severity" min="1" max="10" value="6" style="flex: 1; accent-color: var(--color-ink-primary);" oninput="document.getElementById('severityVal').textContent = this.value">
+                        <span id="severityVal" style="font-family: var(--font-mono); font-weight: 800; width: 28px; text-align: center; color: var(--signal-blue); font-size: 1rem;">6</span>
+                    </div>
+                </div>
+
+                <div class="location-picker-box">
+                    <label for="location" style="margin-bottom: 4px;">Incident Coordinates (Click Map or Pick)</label>
+                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                        <input type="text" id="location" placeholder="Click map or use pick tool..." required style="flex: 1; margin-bottom: 0;">
+                        <button id="pickReportLocationBtn" type="button" title="Pick point on map" style="background: var(--color-ink-primary); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 0.8rem;">🗺️ Pick</button>
+                    </div>
+                    <small id="locationHint" class="picker-hint">📍 Click anywhere on map or drag pin to adjust coordinates.</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label for="address">Address / Landmark (Optional)</label>
+                    <input type="text" id="address" placeholder="e.g., Near Suburban Bus Stand, Mirza Road">
+                </div>
+
+                <div class="form-group">
+                    <label for="crime-details">Incident Details / Observations</label>
+                    <textarea id="crime-details" rows="3" placeholder="Specify exact lane, direction of travel, or observed risk..."></textarea>
+                </div>
+
+                <div id="successMessage" style="color: var(--signal-green); font-weight: 700; font-family: var(--font-mono); font-size: 0.82rem; display: none; margin-top: 10px; padding: 8px; background: var(--signal-green-bg); border: 1px solid rgba(22, 163, 74, 0.3); border-radius: 4px; text-align: center;">Hazard reported and ingested successfully.</div>
+
+                <div style="display: flex; gap: 10px; margin-top: 16px;">
+                    <button type="submit" id="submitCrimeBtn" style="flex: 1; background: var(--signal-red); color: white; border: none; padding: 11px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em;">Submit Report</button>
+                    <button type="button" id="cancelCrimeReport" style="background: var(--color-bg-subtle); color: var(--color-ink-primary); border: 1px solid var(--color-border-grid); padding: 11px 16px; border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 0.85rem; text-transform: uppercase;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Map Script -->
+    <script src="map-script.js"></script>
+</body>
+</html>

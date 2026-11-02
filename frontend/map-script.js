@@ -584,9 +584,23 @@ const cancelCrimeReportBtn = document.getElementById('cancelCrimeReport');
 const locationInput = document.getElementById('location');
 const addressInput = document.getElementById('address');
 const pickReportLocationBtn = document.getElementById('pickReportLocationBtn');
+const searchReportLocationBtn = document.getElementById('searchReportLocationBtn');
 
 let reportCoords = null; // Stores { lat, lng } for reported hazard
 let reportMarker = null; // Draggable Leaflet marker for reporting location
+
+function parseCoordinatePair(value) {
+    const matches = String(value || '').trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+    if (!matches) return null;
+
+    const lat = Number(matches[1]);
+    const lon = Number(matches[2]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+        return null;
+    }
+
+    return { lat, lon };
+}
 
 /**
  * Sets or updates the draggable report hazard location pin on the map
@@ -634,6 +648,7 @@ function openReportModal() {
 
     const center = map.getCenter();
     setReportLocation(center.lat, center.lng, `${center.lat.toFixed(5)}, ${center.lng.toFixed(5)}`);
+    if (addressInput) addressInput.focus();
 }
 
 function closeReportModal() {
@@ -655,6 +670,41 @@ if (pickReportLocationBtn) {
     pickReportLocationBtn.addEventListener('click', () => {
         mapPickingMode = 'report';
         if (modalBackdrop) modalBackdrop.style.display = 'none';
+        if (crimeReportForm) crimeReportForm.style.display = 'none';
+        if (locationInput) {
+            locationInput.value = '';
+        }
+        const locationHint = document.getElementById('locationHint');
+        if (locationHint) locationHint.textContent = '📍 Click a point on the map to assign the incident location.';
+    });
+}
+
+if (searchReportLocationBtn) {
+    searchReportLocationBtn.addEventListener('click', async () => {
+        const query = addressInput ? addressInput.value.trim() : '';
+        if (!query) {
+            alert('Enter an address or landmark before searching.');
+            addressInput?.focus();
+            return;
+        }
+
+        searchReportLocationBtn.disabled = true;
+        searchReportLocationBtn.textContent = 'Searching...';
+        try {
+            const coords = await getCoordinates(query);
+            setReportLocation(coords.lat, coords.lon, `${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)}`);
+            map.setView([coords.lat, coords.lon], Math.max(map.getZoom(), 16));
+            if (modalBackdrop) modalBackdrop.style.display = 'block';
+            if (crimeReportForm) crimeReportForm.style.display = 'block';
+            mapPickingMode = null;
+            const locationHint = document.getElementById('locationHint');
+            if (locationHint) locationHint.textContent = '📍 Location found. Drag the pin or pick another point to adjust it.';
+        } catch (error) {
+            alert(`Location search failed: ${error.message}`);
+        } finally {
+            searchReportLocationBtn.disabled = false;
+            searchReportLocationBtn.textContent = '🔎 Find';
+        }
     });
 }
 
@@ -698,26 +748,28 @@ if (crimeForm) {
         let latitude = null;
         let longitude = null;
 
-        if (reportCoords && reportCoords.lat && reportCoords.lng) {
+        if (reportCoords && Number.isFinite(reportCoords.lat) && Number.isFinite(reportCoords.lng)) {
             latitude = reportCoords.lat;
             longitude = reportCoords.lng;
         } else {
-            const matches = locationStr.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
-            if (matches) {
-                latitude = parseFloat(matches[1]);
-                longitude = parseFloat(matches[2]);
+            const coordinates = parseCoordinatePair(locationStr);
+            if (coordinates) {
+                latitude = coordinates.lat;
+                longitude = coordinates.lon;
             }
         }
 
         if (latitude === null || longitude === null) {
             try {
-                const coords = await getCoordinates(`${locationStr}, ${address}`);
+                if (!locationStr.trim() && !address.trim()) {
+                    throw new Error('Choose a point on the map or search for an address.');
+                }
+                const coords = await getCoordinates(`${locationStr}, ${address}`.replace(/^,\s*|\s*,\s*$/g, ''));
                 latitude = coords.lat;
                 longitude = coords.lon;
             } catch (e) {
-                const center = map.getCenter();
-                latitude = center.lat;
-                longitude = center.lng;
+                alert(`Please choose a valid incident location: ${e.message}`);
+                return;
             }
         }
 
@@ -795,8 +847,11 @@ if (crimeForm) {
 
 async function getCoordinates(query) {
     const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
+        `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&accept-language=en&q=${encodeURIComponent(query)}`
     );
+    if (!response.ok) {
+        throw new Error(`Search service returned ${response.status}`);
+    }
     const data = await response.json();
     if (data.length > 0) {
         return {
@@ -840,6 +895,22 @@ const routeLoadingSpinner = document.getElementById('routeLoadingSpinner');
 const routeCardsContainer = document.getElementById('routeCardsContainer');
 const togglePanelBtn = document.getElementById('togglePanelBtn');
 const panelContent = document.getElementById('panelContent');
+
+sourceInput?.addEventListener('input', () => {
+    sourceCoords = null;
+    if (sourceMarker) {
+        map.removeLayer(sourceMarker);
+        sourceMarker = null;
+    }
+});
+
+destInput?.addEventListener('input', () => {
+    destCoords = null;
+    if (destMarker) {
+        map.removeLayer(destMarker);
+        destMarker = null;
+    }
+});
 
 // Toggle Panel Collapse/Expand
 if (togglePanelBtn && panelContent) {
@@ -889,10 +960,14 @@ if (pickDestBtn) {
 
 // Map Click Handler for Pickers
 map.on('click', async (e) => {
-    if (mapPickingMode === 'report' || (crimeReportForm && crimeReportForm.style.display === 'block')) {
+    if (mapPickingMode === 'report') {
         const { lat, lng } = e.latlng;
         setReportLocation(lat, lng, `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
         if (crimeReportForm) crimeReportForm.style.display = 'block';
+        if (modalBackdrop) modalBackdrop.style.display = 'block';
+        mapPickingMode = null;
+        const locationHint = document.getElementById('locationHint');
+        if (locationHint) locationHint.textContent = '📍 Location selected. Drag the pin or pick another point to adjust it.';
     } else if (mapPickingMode === 'source') {
         const { lat, lng } = e.latlng;
         setSourceLocation(lat, lng, `${lat.toFixed(4)}, ${lng.toFixed(4)}`);
@@ -943,13 +1018,15 @@ if (generateRoutesBtn) {
     generateRoutesBtn.addEventListener('click', async () => {
         try {
             if (!sourceCoords && sourceInput && sourceInput.value.trim() !== '') {
-                const coords = await getCoordinates(sourceInput.value.trim());
-                setSourceLocation(coords.lat, coords.lon, sourceInput.value.trim());
+                const coords = parseCoordinatePair(sourceInput.value) || await getCoordinates(sourceInput.value.trim());
+                setSourceLocation(coords.lat, coords.lon, `${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)}`);
+                map.setView([coords.lat, coords.lon], Math.max(map.getZoom(), 15));
             }
 
             if (!destCoords && destInput && destInput.value.trim() !== '') {
-                const coords = await getCoordinates(destInput.value.trim());
-                setDestinationLocation(coords.lat, coords.lon, destInput.value.trim());
+                const coords = parseCoordinatePair(destInput.value) || await getCoordinates(destInput.value.trim());
+                setDestinationLocation(coords.lat, coords.lon, `${coords.lat.toFixed(5)}, ${coords.lon.toFixed(5)}`);
+                map.setView([coords.lat, coords.lon], Math.max(map.getZoom(), 15));
             }
 
             if (!sourceCoords || !destCoords) {

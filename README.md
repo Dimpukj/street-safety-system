@@ -75,6 +75,10 @@ npm start
 
 Then open [http://localhost:3000/](http://localhost:3000/) to view the landing page, or [http://localhost:3000/map.html](http://localhost:3000/map.html) to open the interactive map. MongoDB is optional for exploration; the application has a local fallback mode when MongoDB is unavailable.
 
+For the complete Vercel deployment workflow, including MongoDB Atlas,
+environment variables, custom domains, and post-deployment checks, see
+[DEPLOYMENT.md](./DEPLOYMENT.md).
+
 For complete prerequisites, environment configuration, database behavior, and demo data instructions, see [Getting Started](#getting-started), [MongoDB Setup](#mongodb-setup), and [Demo Data](#demo-data).
 
 ## Problem Statement

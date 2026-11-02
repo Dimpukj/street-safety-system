@@ -157,9 +157,9 @@ This command should return no output.
 This repository now includes the Vercel entry point
 [`api/index.js`](./api/index.js) and routing configuration
 [`vercel.json`](./vercel.json). The entry point exports the existing Express
-application as a Vercel serverless function. The frontend remains in
-`frontend/`, while Vercel rewrites `/` and static files to that directory and
-rewrites `/api/*` to the Express function.
+application as a Vercel serverless function. Vercel sends every request to the
+Express function, which serves both the `frontend/` files and `/api/*`
+endpoints from one same-origin application.
 
 ### 7.1 Install and authenticate the Vercel CLI
 
@@ -213,8 +213,8 @@ Answer the prompts as follows:
 | Modify settings? | `N` |
 
 Vercel detects `api/index.js` as the Node.js function. The `vercel.json`
-rewrites make the landing page available at `/`, the map at `/map.html`, and
-the API under `/api/*`.
+rewrite sends the landing page, map, static assets, and `/api/*` requests to
+the Express application, preserving the existing same-origin behavior.
 
 ### 7.4 Add Vercel environment variables
 
